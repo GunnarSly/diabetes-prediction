@@ -20,7 +20,7 @@ def T(key):
     return translations[st.session_state.lang].get(key, key)
 
 # ------------------------------------------------------------
-# Session State Setup
+# Session State Initialization
 # ------------------------------------------------------------
 if "lang" not in st.session_state:
     st.session_state.lang = "en"
@@ -32,48 +32,31 @@ if "theme" not in st.session_state:
     st.session_state.theme = "light"
 
 # ------------------------------------------------------------
-# Theme System (Light / Dark)
+# Theme Toggle
 # ------------------------------------------------------------
 def toggle_theme():
     st.session_state.theme = "dark" if st.session_state.theme == "light" else "light"
-    st.experimental_rerun()
 
 def apply_theme():
     if st.session_state.theme == "dark":
-        st.markdown(
-            """
+        st.markdown("""
             <style>
-            .stApp {
-                background-color: #0e1117 !important;
-                color: #f5f5f5 !important;
-            }
-            h1, h2, h3, h4, h5, h6, label, span, div, p, input, textarea {
-                color: #f5f5f5 !important;
-            }
+            .stApp { background-color: #0e1117 !important; color: #ffffff !important; }
+            h1, h2, h3, h4, h5, h6, label, span, p, div { color: #ffffff !important; }
             </style>
-            """,
-            unsafe_allow_html=True,
-        )
+        """, unsafe_allow_html=True)
     else:
-        st.markdown(
-            """
+        st.markdown("""
             <style>
-            .stApp {
-                background-color: #ffffff !important;
-                color: #000000 !important;
-            }
-            h1, h2, h3, h4, h5, h6, label, span, div, p, input, textarea {
-                color: #000000 !important;
-            }
+            .stApp { background-color: #ffffff !important; color: #000000 !important; }
+            h1, h2, h3, h4, h5, h6, label, span, p, div { color: #000000 !important; }
             </style>
-            """,
-            unsafe_allow_html=True,
-        )
+        """, unsafe_allow_html=True)
 
 apply_theme()
 
 # ------------------------------------------------------------
-# Models Loader
+# Load Models (joblib + h5 ONLY)
 # ------------------------------------------------------------
 def load_models():
     models = {}
@@ -100,11 +83,10 @@ def load_models():
 models = load_models()
 
 # ------------------------------------------------------------
-# Navigation
+# Page Navigation
 # ------------------------------------------------------------
 def go_to(page):
     st.session_state.page = page
-    st.experimental_rerun()
 
 # ------------------------------------------------------------
 # HOME PAGE
@@ -117,36 +99,35 @@ def home_page():
     except:
         pass
 
-    # University Name (Translated)
-    st.markdown(f"### {T('university')}", unsafe_allow_html=True)
+    # University Name
+    st.markdown(f"### {T('university')}")
 
     st.title(T("title"))
     st.write(T("description"))
     st.divider()
 
-    # Sidebar (theme, language, models)
+    # SIDEBAR
     with st.sidebar:
-        if st.button(T("theme")):
-            toggle_theme()
+
+        st.button(T("theme"), on_click=toggle_theme)
 
         lang_choice = st.radio(T("language"), ["English", "العربية"])
-
         new_lang = "ar" if lang_choice == "العربية" else "en"
+
         if new_lang != st.session_state.lang:
             st.session_state.lang = new_lang
             st.experimental_rerun()
 
         st.subheader(T("select_model"))
-
         if len(models) == 0:
-            st.error("No models found")
+            st.error("No models found in models/")
             model_name = None
         else:
             model_name = st.selectbox("", list(models.keys()))
 
     st.subheader(T("input_data"))
 
-    # Input ranges
+    # Input fields with logical ranges
     col1, col2 = st.columns(2)
 
     with col1:
@@ -163,7 +144,7 @@ def home_page():
 
     st.divider()
 
-    # Prediction
+    # Prediction Button
     if st.button(T("predict"), use_container_width=True):
         st.session_state.pred_input = np.array(
             [[preg, glucose, bp, skin, insulin, bmi, dpf, age]], dtype=float
@@ -181,17 +162,15 @@ def result_page():
     except:
         pass
 
-    st.markdown(f"### {T('university')}", unsafe_allow_html=True)
-
+    st.markdown(f"### {T('university')}")
     st.title(T("result_title"))
     st.divider()
 
-    # Model Prediction
     model = models.get(st.session_state.selected_model, None)
     data = st.session_state.pred_input
 
     if model is None:
-        st.error("Model not found")
+        st.error("Model not found.")
         return
 
     try:
@@ -204,16 +183,14 @@ def result_page():
 
     st.markdown(
         f"<h1 style='text-align:center; font-size:60px;'>{result_label}</h1>",
-        unsafe_allow_html=True,
+        unsafe_allow_html=True
     )
 
     st.divider()
-
-    if st.button(T("back"), use_container_width=True):
-        go_to("home")
+    st.button(T("back"), on_click=lambda: go_to("home"), use_container_width=True)
 
 # ------------------------------------------------------------
-# Render Pages
+# RENDER
 # ------------------------------------------------------------
 if st.session_state.page == "home":
     home_page()
