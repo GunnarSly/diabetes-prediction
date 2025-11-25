@@ -32,7 +32,7 @@ def go_to(page):
     st.session_state.page = page
 
 # ------------------------------------------------------------
-# Theme (Light / Dark) + CSS
+# Theme (Light / Dark)
 # ------------------------------------------------------------
 if "theme" not in st.session_state:
     st.session_state.theme = "light"
@@ -47,7 +47,10 @@ def apply_theme():
             <style>
             .stApp {
                 background-color: #0e1117;
-                color: #f5f5f5;
+                color: #f5f5f5 !important;
+            }
+            h1, h2, h3, h4, h5, h6, label, span, div, p {
+                color: #f5f5f5 !important;
             }
             </style>
             """,
@@ -59,7 +62,10 @@ def apply_theme():
             <style>
             .stApp {
                 background-color: #ffffff;
-                color: #000000;
+                color: #000000 !important;
+            }
+            h1, h2, h3, h4, h5, h6, label, span, div, p {
+                color: #000000 !important;
             }
             </style>
             """,
@@ -106,11 +112,12 @@ def home_page():
     except:
         st.write("")
 
+    st.markdown(f"### {T('university')}", unsafe_allow_html=True)
     st.title(T("title"))
     st.write(T("description"))
     st.divider()
 
-    # Sidebar (Theme + Language + Model)
+    # Sidebar
     with st.sidebar:
         st.button(T("theme"), on_click=toggle_theme)
         lang_choice = st.radio(T("language"), ["English", "العربية"])
@@ -123,100 +130,43 @@ def home_page():
         else:
             model_name = st.selectbox("", list(models.keys()))
 
-    st.subheader("Input Data")
+    st.subheader(T("input_data"))
 
-    # Ranges (منطقية مبنية على الداتا التي أعطيتها)
-    # Pregnancies: 0–20
-    # Glucose: 0–220
-    # BP: 0–140
-    # Skin: 0–100
-    # Insulin: 0–900
-    # BMI: 0.0–70.0
-    # DPF: 0.0–3.0
-    # Age: 18–90
-
+    # Ranges
     col1, col2 = st.columns(2)
 
     with col1:
-        preg_manual = st.number_input(
-            T("pregnancies") + " (Manual)", min_value=0, max_value=20, step=1
-        )
-        preg_range = st.slider(
-            T("pregnancies") + " (Range)", 0, 20, 3
-        )
-
-        glucose_manual = st.number_input(
-            T("glucose") + " (Manual)", min_value=0, max_value=220, step=1
-        )
-        glucose_range = st.slider(
-            T("glucose") + " (Range)", 0, 220, 110
-        )
-
-        bp_manual = st.number_input(
-            T("bp") + " (Manual)", min_value=0, max_value=140, step=1
-        )
-        bp_range = st.slider(
-            T("bp") + " (Range)", 0, 140, 70
-        )
-
-        skin_manual = st.number_input(
-            T("skin") + " (Manual)", min_value=0, max_value=100, step=1
-        )
-        skin_range = st.slider(
-            T("skin") + " (Range)", 0, 100, 20
-        )
+        preg_manual = st.number_input(T("pregnancies"), 0, 20)
+        glucose_manual = st.number_input(T("glucose"), 0, 220)
+        bp_manual = st.number_input(T("bp"), 0, 140)
+        skin_manual = st.number_input(T("skin"), 0, 100)
 
     with col2:
-        insulin_manual = st.number_input(
-            T("insulin") + " (Manual)", min_value=0, max_value=900, step=1
-        )
-        insulin_range = st.slider(
-            T("insulin") + " (Range)", 0, 900, 80
-        )
-
-        bmi_manual = st.number_input(
-            T("bmi") + " (Manual)", min_value=0.0, max_value=70.0, step=0.1
-        )
-        bmi_range = st.slider(
-            T("bmi") + " (Range)", 0.0, 70.0, 25.0
-        )
-
-        dpf_manual = st.number_input(
-            T("dpf") + " (Manual)", min_value=0.0, max_value=3.0, step=0.01, format="%.4f"
-        )
-        dpf_range = st.slider(
-            T("dpf") + " (Range)", 0.0, 3.0, 0.5
-        )
-
-        age_manual = st.number_input(
-            T("age") + " (Manual)", min_value=18, max_value=90, step=1
-        )
-        age_range = st.slider(
-            T("age") + " (Range)", 18, 90, 40
-        )
+        insulin_manual = st.number_input(T("insulin"), 0, 900)
+        bmi_manual = st.number_input(T("bmi"), 0.0, 70.0)
+        dpf_manual = st.number_input(T("dpf"), 0.0, 3.0, format="%.4f")
+        age_manual = st.number_input(T("age"), 18, 90)
 
     st.divider()
 
-    manual_mode = st.radio("Input method:", ["Manual", "Range"])
+    manual_mode = st.radio(T("input_method"), [T("manual"), T("range")])
 
-    if manual_mode == "Manual":
+    if manual_mode == T("manual"):
         values = [
             preg_manual, glucose_manual, bp_manual, skin_manual,
             insulin_manual, bmi_manual, dpf_manual, age_manual
         ]
     else:
+        st.write("Use the ranges above")  
         values = [
-            preg_range, glucose_range, bp_range, skin_range,
-            insulin_range, bmi_range, dpf_range, age_range
+            preg_manual, glucose_manual, bp_manual, skin_manual,
+            insulin_manual, bmi_manual, dpf_manual, age_manual
         ]
 
     if st.button(T("predict"), use_container_width=True):
-        if model_name is None:
-            st.error("No model selected.")
-        else:
-            st.session_state.pred_input = np.array([values], dtype=float)
-            st.session_state.selected_model = model_name
-            go_to("result")
+        st.session_state.pred_input = np.array([values], dtype=float)
+        st.session_state.selected_model = model_name
+        go_to("result")
 
 
 # ------------------------------------------------------------
@@ -224,22 +174,17 @@ def home_page():
 # ------------------------------------------------------------
 def result_page():
 
-    # Logo (JPG)
     try:
         st.image("images/university_logo.jpg", use_column_width=False, width=200)
     except:
         st.write("")
 
+    st.markdown(f"### {T('university')}", unsafe_allow_html=True)
     st.title(T("result_title"))
     st.divider()
 
     model = models.get(st.session_state.selected_model, None)
     data = st.session_state.pred_input
-
-    if model is None:
-        st.error("Selected model not found.")
-        st.button(T("back"), on_click=lambda: go_to("home"), use_container_width=True)
-        return
 
     try:
         pred = model.predict(data)
@@ -256,7 +201,6 @@ def result_page():
 
     st.divider()
     st.button(T("back"), on_click=lambda: go_to("home"), use_container_width=True)
-
 
 # ------------------------------------------------------------
 # RENDER
