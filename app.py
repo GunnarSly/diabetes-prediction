@@ -69,8 +69,8 @@ def toggle_theme():
 # ------------------------------------------------------------
 def home_page():
 
-    # Logo
-    st.image("images/university_logo.png", use_column_width=False, width=200)
+    # Logo (UPDATED → JPG)
+    st.image("images/university_logo.jpg", use_column_width=False, width=200)
 
     st.title(T("title"))
     st.write(T("description"))
@@ -141,6 +141,8 @@ def home_page():
 # RESULT PAGE
 # ------------------------------------------------------------
 def result_page():
+
+    # Logo (UPDATED → JPG)
     st.image("images/university_logo.jpg", use_column_width=False, width=200)
 
     st.title(T("result_title"))
@@ -164,6 +166,7 @@ def result_page():
 
     st.divider()
     st.button(T("back"), on_click=lambda: go_to("home"), use_container_width=True)
+
 
 # ------------------------------------------------------------
 # RENDER
