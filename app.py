@@ -14,12 +14,6 @@ with open("assets/translations.json", "r", encoding="utf-8") as f:
     translations = json.load(f)
 
 # ------------------------------------------------------------
-# Translation Helper
-# ------------------------------------------------------------
-def T(key):
-    return translations[st.session_state.lang].get(key, key)
-
-# ------------------------------------------------------------
 # Session State Initialization
 # ------------------------------------------------------------
 if "lang" not in st.session_state:
@@ -32,58 +26,70 @@ if "theme" not in st.session_state:
     st.session_state.theme = "light"
 
 # ------------------------------------------------------------
-# Theme Toggle
+# Translation Helper
 # ------------------------------------------------------------
-def toggle_theme():
-    st.session_state.theme = "dark" if st.session_state.theme == "light" else "light"
+def T(key):
+    return translations[st.session_state.lang].get(key, key)
 
+# ------------------------------------------------------------
+# Language + Theme Callbacks (No rerun inside pages)
+# ------------------------------------------------------------
+def update_language():
+    choice = st.session_state.lang_selector
+    st.session_state.lang = "ar" if choice == "العربية" else "en"
+
+def update_theme():
+    st.session_state.theme = (
+        "dark" if st.session_state.theme == "light" else "light"
+    )
+
+# ------------------------------------------------------------
+# Apply Theme
+# ------------------------------------------------------------
 def apply_theme():
     if st.session_state.theme == "dark":
         st.markdown("""
             <style>
-            .stApp { background-color: #0e1117 !important; color: #ffffff !important; }
-            h1, h2, h3, h4, h5, h6, label, span, p, div { color: #ffffff !important; }
+            .stApp { background-color:#0e1117; color:#ffffff; }
+            h1,h2,h3,h4,h5,h6,label,span,p,div { color:#ffffff !important; }
             </style>
         """, unsafe_allow_html=True)
     else:
         st.markdown("""
             <style>
-            .stApp { background-color: #ffffff !important; color: #000000 !important; }
-            h1, h2, h3, h4, h5, h6, label, span, p, div { color: #000000 !important; }
+            .stApp { background-color:#ffffff; color:#000000; }
+            h1,h2,h3,h4,h5,h6,label,span,p,div { color:#000000 !important; }
             </style>
         """, unsafe_allow_html=True)
 
 apply_theme()
 
 # ------------------------------------------------------------
-# Load Models (joblib + h5 ONLY)
+# Load Models (joblib + h5)
 # ------------------------------------------------------------
 def load_models():
     models = {}
-    if not os.path.isdir("models"):
-        return models
+    if os.path.isdir("models"):
+        for file in os.listdir("models"):
+            path = os.path.join("models", file)
 
-    for file in os.listdir("models"):
-        path = os.path.join("models", file)
+            if file.endswith(".joblib"):
+                try:
+                    models[file] = joblib.load(path)
+                except:
+                    pass
 
-        if file.endswith(".joblib"):
-            try:
-                models[file] = joblib.load(path)
-            except:
-                pass
-
-        elif file.endswith(".h5"):
-            try:
-                models[file] = load_model(path)
-            except:
-                pass
-
+            elif file.endswith(".h5"):
+                try:
+                    models[file] = load_model(path)
+                except:
+                    pass
     return models
 
 models = load_models()
 
 # ------------------------------------------------------------
-# Page Navigation
+# Navigation
 # ------------------------------------------------------------
 def go_to(page):
     st.session_state.page = page
@@ -93,41 +99,38 @@ def go_to(page):
 # ------------------------------------------------------------
 def home_page():
 
-    # Logo
+    # University Logo
     try:
         st.image("images/university_logo.jpg", width=200)
     except:
         pass
 
-    # University Name
     st.markdown(f"### {T('university')}")
-
     st.title(T("title"))
     st.write(T("description"))
     st.divider()
 
-    # SIDEBAR
+    # Sidebar
     with st.sidebar:
 
-        st.button(T("theme"), on_click=toggle_theme)
+        st.button(T("theme"), on_click=update_theme)
 
-        lang_choice = st.radio(T("language"), ["English", "العربية"])
-        new_lang = "ar" if lang_choice == "العربية" else "en"
-
-        if new_lang != st.session_state.lang:
-            st.session_state.lang = new_lang
-            st.experimental_rerun()
+        st.radio(
+            T("language"),
+            ["English", "العربية"],
+            key="lang_selector",
+            on_change=update_language
+        )
 
         st.subheader(T("select_model"))
         if len(models) == 0:
-            st.error("No models found in models/")
+            st.error("No models found.")
             model_name = None
         else:
             model_name = st.selectbox("", list(models.keys()))
 
+    # Input Data
     st.subheader(T("input_data"))
-
-    # Input fields with logical ranges
     col1, col2 = st.columns(2)
 
     with col1:
@@ -144,7 +147,7 @@ def home_page():
 
     st.divider()
 
-    # Prediction Button
+    # Predict Button
     if st.button(T("predict"), use_container_width=True):
         st.session_state.pred_input = np.array(
             [[preg, glucose, bp, skin, insulin, bmi, dpf, age]], dtype=float
@@ -183,11 +186,12 @@ def result_page():
 
     st.markdown(
         f"<h1 style='text-align:center; font-size:60px;'>{result_label}</h1>",
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
 
     st.divider()
-    st.button(T("back"), on_click=lambda: go_to("home"), use_container_width=True)
+    if st.button(T("back"), use_container_width=True):
+        go_to("home")
 
 # ------------------------------------------------------------
 # RENDER
