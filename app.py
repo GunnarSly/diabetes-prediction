@@ -41,7 +41,7 @@ def update_theme():
     st.session_state.theme = "dark" if st.session_state.theme == "light" else "light"
 
 # ------------------------------------------------------------
-# Apply Theme + Animations + Footer Style
+# Apply Theme + Animations (WITHOUT FOOTER CSS)
 # ------------------------------------------------------------
 def apply_theme():
     if st.session_state.theme == "dark":
@@ -51,9 +51,6 @@ def apply_theme():
                 background-color:#0e1117;
                 color:#ffffff;
                 min-height: 100vh;
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
             }
 
             h1,h2,h3,h4,h5,h6,label,span,p,div {
@@ -61,33 +58,23 @@ def apply_theme():
             }
 
             /* Fade-in */
-            .fade-in { animation: fadeIn 1.2s ease-in-out; }
+            .fade-in {
+                animation: fadeIn 1.2s ease-in-out;
+            }
             @keyframes fadeIn {
                 from { opacity:0; transform: translateY(10px); }
                 to { opacity:1; transform: translateY(0); }
             }
 
             /* Bounce */
-            .bounce { animation: bounceIn 0.9s ease; }
+            .bounce {
+                animation: bounceIn 0.9s ease;
+            }
             @keyframes bounceIn {
                 0% { transform: scale(0.3); opacity: 0; }
                 50% { transform: scale(1.05); opacity: 1; }
                 70% { transform: scale(0.9); }
                 100% { transform: scale(1); }
-            }
-
-            /* Sticky Footer */
-            .footer {
-                position: sticky;
-                bottom: 0;
-                width: 100%;
-                background-color: #111;
-                padding: 12px;
-                text-align: center;
-                font-size: 14px;
-                color: #ccc;
-                border-top: 1px solid #444;
-                margin-top: 40px;
             }
             </style>
         """, unsafe_allow_html=True)
@@ -99,40 +86,28 @@ def apply_theme():
                 background-color:#ffffff;
                 color:#000000;
                 min-height: 100vh;
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
             }
 
             h1,h2,h3,h4,h5,h6,label,span,p,div {
                 color:#000000 !important;
             }
 
-            .fade-in { animation: fadeIn 1.2s ease-in-out; }
+            .fade-in {
+                animation: fadeIn 1.2s ease-in-out;
+            }
             @keyframes fadeIn {
                 from { opacity:0; transform: translateY(10px); }
                 to { opacity:1; transform: translateY(0); }
             }
 
-            .bounce { animation: bounceIn 0.9s ease; }
+            .bounce {
+                animation: bounceIn 0.9s ease;
+            }
             @keyframes bounceIn {
                 0% { transform: scale(0.3); opacity: 0; }
                 50% { transform: scale(1.05); opacity: 1; }
                 70% { transform: scale(0.9); }
                 100% { transform: scale(1); }
-            }
-
-            .footer {
-                position: sticky;
-                bottom: 0;
-                width: 100%;
-                background-color: #f2f2f2;
-                padding: 12px;
-                text-align: center;
-                font-size: 14px;
-                color: #444;
-                border-top: 1px solid #ccc;
-                margin-top: 40px;
             }
             </style>
         """, unsafe_allow_html=True)
@@ -171,6 +146,20 @@ def go_to(page):
     st.session_state.page = page
 
 # ------------------------------------------------------------
+# UNIVERSAL FOOTER (NOT FIXED, NATURAL BOTTOM)
+# ------------------------------------------------------------
+footer_html = """
+<div style='width:100%; text-align:center; padding:12px; font-size:14px; opacity:0.8; margin-top:40px;'>
+    جامعة العرب للعلوم الطبية والتكنولوجيا<br>
+    Arab University for Medical Sciences and Technology<br>
+    <a href='https://armu.edu.ly' target='_blank'>https://armu.edu.ly</a><br>
+    info@armu.edu.ly | +218 93-0600072<br>
+    © 2025 Suliman & Ayob - All Rights Reserved<br>
+    <a href='https://www.facebook.com/share/1FubzJnpDh/' target='_blank'>Facebook Page</a>
+</div>
+"""
+
+# ------------------------------------------------------------
 # HOME PAGE
 # ------------------------------------------------------------
 def home_page():
@@ -195,12 +184,7 @@ def home_page():
         )
 
         st.subheader(T("select_model"))
-
-        if len(models) == 0:
-            st.error("No models found.")
-            model_name = None
-        else:
-            model_name = st.selectbox("", list(models.keys()))
+        model_name = st.selectbox("", list(models.keys())) if len(models) > 0 else None
 
     st.subheader(T("input_data"))
 
@@ -227,6 +211,9 @@ def home_page():
         st.session_state.selected_model = model_name
         go_to("result")
 
+    # Footer at bottom of home page
+    st.markdown(footer_html, unsafe_allow_html=True)
+
 # ------------------------------------------------------------
 # RESULT PAGE
 # ------------------------------------------------------------
@@ -241,12 +228,9 @@ def result_page():
     model = models.get(st.session_state.selected_model, None)
     data = st.session_state.pred_input
 
-    try:
-        pred = model.predict(data)
-    except:
-        pred = model.predict(data)[0][0]
+    pred = model.predict(data)
+    pred = float(pred[0]) if isinstance(pred, (list, tuple)) else float(pred)
 
-    pred = float(pred)
     result_label = T("diabetic") if pred > 0.5 else T("not_diabetic")
 
     st.markdown(
@@ -259,20 +243,8 @@ def result_page():
     if st.button(T("back"), use_container_width=True):
         go_to("home")
 
-# ------------------------------------------------------------
-# STICKY FOOTER (FINAL)
-# ------------------------------------------------------------
-footer_html = """
-<div class='footer'>
-    جامعة العرب للعلوم الطبية والتكنولوجيا<br>
-    Arab University for Medical Sciences and Technology<br>
-    <a href='https://armu.edu.ly' target='_blank'>https://armu.edu.ly</a><br>
-    info@armu.edu.ly | +218 93-0600072<br>
-    © 2025 Suliman & Ayob - All Rights Reserved<br>
-    <a href='https://www.facebook.com/share/1FubzJnpDh/' target='_blank'>Facebook Page</a>
-</div>
-"""
-st.markdown(footer_html, unsafe_allow_html=True)
+    # Footer at bottom of result page
+    st.markdown(footer_html, unsafe_allow_html=True)
 
 # ------------------------------------------------------------
 # RENDER PAGE
