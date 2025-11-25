@@ -53,6 +53,7 @@ def apply_theme():
                 min-height: 100vh;
                 display: flex;
                 flex-direction: column;
+                justify-content: space-between;
             }
 
             h1,h2,h3,h4,h5,h6,label,span,p,div {
@@ -60,18 +61,14 @@ def apply_theme():
             }
 
             /* Fade-in */
-            .fade-in {
-                animation: fadeIn 1.2s ease-in-out;
-            }
+            .fade-in { animation: fadeIn 1.2s ease-in-out; }
             @keyframes fadeIn {
                 from { opacity:0; transform: translateY(10px); }
                 to { opacity:1; transform: translateY(0); }
             }
 
             /* Bounce */
-            .bounce {
-                animation: bounceIn 0.9s ease;
-            }
+            .bounce { animation: bounceIn 0.9s ease; }
             @keyframes bounceIn {
                 0% { transform: scale(0.3); opacity: 0; }
                 50% { transform: scale(1.05); opacity: 1; }
@@ -79,15 +76,18 @@ def apply_theme():
                 100% { transform: scale(1); }
             }
 
-            /* Dynamic Footer */
+            /* Sticky Footer */
             .footer {
+                position: sticky;
+                bottom: 0;
                 width: 100%;
+                background-color: #111;
                 padding: 12px;
                 text-align: center;
-                margin-top: 50px;
                 font-size: 14px;
-                color: #bbbbbb;
+                color: #ccc;
                 border-top: 1px solid #444;
+                margin-top: 40px;
             }
             </style>
         """, unsafe_allow_html=True)
@@ -101,25 +101,20 @@ def apply_theme():
                 min-height: 100vh;
                 display: flex;
                 flex-direction: column;
+                justify-content: space-between;
             }
 
             h1,h2,h3,h4,h5,h6,label,span,p,div {
                 color:#000000 !important;
             }
 
-            .fade-in {
-                animation: fadeIn 1.2s ease-in-out;
-            }
-
+            .fade-in { animation: fadeIn 1.2s ease-in-out; }
             @keyframes fadeIn {
                 from { opacity:0; transform: translateY(10px); }
                 to { opacity:1; transform: translateY(0); }
             }
 
-            .bounce {
-                animation: bounceIn 0.9s ease;
-            }
-
+            .bounce { animation: bounceIn 0.9s ease; }
             @keyframes bounceIn {
                 0% { transform: scale(0.3); opacity: 0; }
                 50% { transform: scale(1.05); opacity: 1; }
@@ -128,13 +123,16 @@ def apply_theme():
             }
 
             .footer {
+                position: sticky;
+                bottom: 0;
                 width: 100%;
+                background-color: #f2f2f2;
                 padding: 12px;
                 text-align: center;
-                margin-top: 50px;
                 font-size: 14px;
                 color: #444;
                 border-top: 1px solid #ccc;
+                margin-top: 40px;
             }
             </style>
         """, unsafe_allow_html=True)
@@ -177,10 +175,7 @@ def go_to(page):
 # ------------------------------------------------------------
 def home_page():
 
-    try:
-        st.image("images/university_logo.jpg", width=380)
-    except:
-        pass
+    st.image("images/university_logo.jpg", use_column_width=False, width=200)
 
     st.markdown(f"<h3 class='fade-in'>{T('university')}</h3>", unsafe_allow_html=True)
     st.markdown(f"<h1 class='fade-in'>{T('title')}</h1>", unsafe_allow_html=True)
@@ -237,10 +232,7 @@ def home_page():
 # ------------------------------------------------------------
 def result_page():
 
-    try:
-        st.image("images/university_logo.jpg", width=380)
-    except:
-        pass
+    st.image("images/university_logo.jpg", use_column_width=False, width=200)
 
     st.markdown(f"<h3>{T('university')}</h3>", unsafe_allow_html=True)
     st.title(T("result_title"))
@@ -268,7 +260,7 @@ def result_page():
         go_to("home")
 
 # ------------------------------------------------------------
-# FOOTER (DYNAMIC, NOT FIXED)
+# STICKY FOOTER (FINAL)
 # ------------------------------------------------------------
 footer_html = """
 <div class='footer'>
