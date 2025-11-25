@@ -99,7 +99,7 @@ def home_page():
 
     # Logo
     try:
-        st.image("images/university_logo.jpg", width=200)
+        st.image("images/university_logo.jpg", use_column_width=False, width=200)
     except:
         pass
 
@@ -161,7 +161,7 @@ def home_page():
 def result_page():
 
     try:
-        st.image("images/university_logo.jpg", width=200)
+        st.image("images/university_logo.jpg", use_column_width=False, width=200)
     except:
         pass
 
@@ -200,4 +200,5 @@ if st.session_state.page == "home":
     home_page()
 else:
     result_page()
+
 
