@@ -14,31 +14,29 @@ with open("assets/translations.json", "r", encoding="utf-8") as f:
     translations = json.load(f)
 
 # ------------------------------------------------------------
-# Language Handler
+# Translation Helper
 # ------------------------------------------------------------
-if "lang" not in st.session_state:
-    st.session_state.lang = "en"
-
 def T(key):
     return translations[st.session_state.lang].get(key, key)
 
 # ------------------------------------------------------------
-# Page Navigation
+# Session State Setup
 # ------------------------------------------------------------
+if "lang" not in st.session_state:
+    st.session_state.lang = "en"
+
 if "page" not in st.session_state:
     st.session_state.page = "home"
 
-def go_to(page):
-    st.session_state.page = page
-
-# ------------------------------------------------------------
-# Theme (Light / Dark)
-# ------------------------------------------------------------
 if "theme" not in st.session_state:
     st.session_state.theme = "light"
 
+# ------------------------------------------------------------
+# Theme System (Light / Dark)
+# ------------------------------------------------------------
 def toggle_theme():
     st.session_state.theme = "dark" if st.session_state.theme == "light" else "light"
+    st.experimental_rerun()
 
 def apply_theme():
     if st.session_state.theme == "dark":
@@ -46,10 +44,10 @@ def apply_theme():
             """
             <style>
             .stApp {
-                background-color: #0e1117;
+                background-color: #0e1117 !important;
                 color: #f5f5f5 !important;
             }
-            h1, h2, h3, h4, h5, h6, label, span, div, p {
+            h1, h2, h3, h4, h5, h6, label, span, div, p, input, textarea {
                 color: #f5f5f5 !important;
             }
             </style>
@@ -61,10 +59,10 @@ def apply_theme():
             """
             <style>
             .stApp {
-                background-color: #ffffff;
+                background-color: #ffffff !important;
                 color: #000000 !important;
             }
-            h1, h2, h3, h4, h5, h6, label, span, div, p {
+            h1, h2, h3, h4, h5, h6, label, span, div, p, input, textarea {
                 color: #000000 !important;
             }
             </style>
@@ -75,7 +73,7 @@ def apply_theme():
 apply_theme()
 
 # ------------------------------------------------------------
-# Load Models (joblib + h5 ONLY)
+# Models Loader
 # ------------------------------------------------------------
 def load_models():
     models = {}
@@ -102,72 +100,76 @@ def load_models():
 models = load_models()
 
 # ------------------------------------------------------------
+# Navigation
+# ------------------------------------------------------------
+def go_to(page):
+    st.session_state.page = page
+    st.experimental_rerun()
+
+# ------------------------------------------------------------
 # HOME PAGE
 # ------------------------------------------------------------
 def home_page():
 
-    # Logo (JPG)
+    # Logo
     try:
-        st.image("images/university_logo.jpg", use_column_width=False, width=200)
+        st.image("images/university_logo.jpg", width=200)
     except:
-        st.write("")
+        pass
 
+    # University Name (Translated)
     st.markdown(f"### {T('university')}", unsafe_allow_html=True)
+
     st.title(T("title"))
     st.write(T("description"))
     st.divider()
 
-    # Sidebar
+    # Sidebar (theme, language, models)
     with st.sidebar:
-        st.button(T("theme"), on_click=toggle_theme)
+        if st.button(T("theme")):
+            toggle_theme()
+
         lang_choice = st.radio(T("language"), ["English", "العربية"])
-        st.session_state.lang = "ar" if lang_choice == "العربية" else "en"
+
+        new_lang = "ar" if lang_choice == "العربية" else "en"
+        if new_lang != st.session_state.lang:
+            st.session_state.lang = new_lang
+            st.experimental_rerun()
 
         st.subheader(T("select_model"))
+
         if len(models) == 0:
-            st.error("No models found in 'models/'")
+            st.error("No models found")
             model_name = None
         else:
             model_name = st.selectbox("", list(models.keys()))
 
     st.subheader(T("input_data"))
 
-    # Ranges
+    # Input ranges
     col1, col2 = st.columns(2)
 
     with col1:
-        preg_manual = st.number_input(T("pregnancies"), 0, 20)
-        glucose_manual = st.number_input(T("glucose"), 0, 220)
-        bp_manual = st.number_input(T("bp"), 0, 140)
-        skin_manual = st.number_input(T("skin"), 0, 100)
+        preg = st.number_input(T("pregnancies"), 0, 20)
+        glucose = st.number_input(T("glucose"), 0, 220)
+        bp = st.number_input(T("bp"), 0, 140)
+        skin = st.number_input(T("skin"), 0, 100)
 
     with col2:
-        insulin_manual = st.number_input(T("insulin"), 0, 900)
-        bmi_manual = st.number_input(T("bmi"), 0.0, 70.0)
-        dpf_manual = st.number_input(T("dpf"), 0.0, 3.0, format="%.4f")
-        age_manual = st.number_input(T("age"), 18, 90)
+        insulin = st.number_input(T("insulin"), 0, 900)
+        bmi = st.number_input(T("bmi"), 0.0, 70.0)
+        dpf = st.number_input(T("dpf"), 0.0, 3.0, format="%.4f")
+        age = st.number_input(T("age"), 18, 90)
 
     st.divider()
 
-    manual_mode = st.radio(T("input_method"), [T("manual"), T("range")])
-
-    if manual_mode == T("manual"):
-        values = [
-            preg_manual, glucose_manual, bp_manual, skin_manual,
-            insulin_manual, bmi_manual, dpf_manual, age_manual
-        ]
-    else:
-        st.write("Use the ranges above")  
-        values = [
-            preg_manual, glucose_manual, bp_manual, skin_manual,
-            insulin_manual, bmi_manual, dpf_manual, age_manual
-        ]
-
+    # Prediction
     if st.button(T("predict"), use_container_width=True):
-        st.session_state.pred_input = np.array([values], dtype=float)
+        st.session_state.pred_input = np.array(
+            [[preg, glucose, bp, skin, insulin, bmi, dpf, age]], dtype=float
+        )
         st.session_state.selected_model = model_name
         go_to("result")
-
 
 # ------------------------------------------------------------
 # RESULT PAGE
@@ -175,35 +177,43 @@ def home_page():
 def result_page():
 
     try:
-        st.image("images/university_logo.jpg", use_column_width=False, width=200)
+        st.image("images/university_logo.jpg", width=200)
     except:
-        st.write("")
+        pass
 
     st.markdown(f"### {T('university')}", unsafe_allow_html=True)
+
     st.title(T("result_title"))
     st.divider()
 
+    # Model Prediction
     model = models.get(st.session_state.selected_model, None)
     data = st.session_state.pred_input
+
+    if model is None:
+        st.error("Model not found")
+        return
 
     try:
         pred = model.predict(data)
     except:
         pred = model.predict(data)[0][0]
 
-    pred_val = float(pred)
-    final = T("diabetic") if pred_val > 0.5 else T("not_diabetic")
+    pred = float(pred)
+    result_label = T("diabetic") if pred > 0.5 else T("not_diabetic")
 
     st.markdown(
-        f"<h1 style='text-align:center; font-size:60px;'>{final}</h1>",
-        unsafe_allow_html=True
+        f"<h1 style='text-align:center; font-size:60px;'>{result_label}</h1>",
+        unsafe_allow_html=True,
     )
 
     st.divider()
-    st.button(T("back"), on_click=lambda: go_to("home"), use_container_width=True)
+
+    if st.button(T("back"), use_container_width=True):
+        go_to("home")
 
 # ------------------------------------------------------------
-# RENDER
+# Render Pages
 # ------------------------------------------------------------
 if st.session_state.page == "home":
     home_page()
