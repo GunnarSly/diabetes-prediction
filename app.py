@@ -123,17 +123,14 @@ def apply_theme():
             }
 
             .footer {
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                width: 100%;
-                background-color: #f0f0f0;
-                padding: 10px;
-                text-align: center;
-                color: #333;
-                font-size: 14px;
-                border-top: 1px solid #ccc;
-            }
+    width: 100%;
+    padding: 10px;
+    text-align: center;
+    margin-top: 40px;
+    font-size: 14px;
+    opacity: 0.9;
+}
+
             </style>
         """, unsafe_allow_html=True)
 
@@ -293,3 +290,4 @@ if st.session_state.page == "home":
     home_page()
 else:
     result_page()
+
