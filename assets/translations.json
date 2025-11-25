@@ -1,42 +1,59 @@
 {
-    "en": {
-        "title": "Diabetes Prediction System",
-        "description": "Enter patient laboratory values below to predict diabetes.",
-        "pregnancies": "Pregnancies",
-        "glucose": "Glucose Level",
-        "bp": "Blood Pressure",
-        "skin": "Skin Thickness",
-        "insulin": "Insulin Level",
-        "bmi": "BMI",
-        "dpf": "Diabetes Pedigree Function",
-        "age": "Age",
-        "select_model": "Select a Model",
-        "predict": "Predict",
-        "result_title": "Prediction Result",
-        "diabetic": "Diabetic",
-        "not_diabetic": "Not Diabetic",
-        "back": "Back",
-        "theme": "Switch Theme",
-        "language": "Language"
-    },
-    "ar": {
-        "title": "نظام التنبؤ بمرض السكري",
-        "description": "أدخل قيم التحاليل المخبرية للمريض للتنبؤ بمرض السكري.",
-        "pregnancies": "عدد مرات الحمل",
-        "glucose": "مستوى الجلوكوز",
-        "bp": "ضغط الدم",
-        "skin": "سماكة الجلد",
-        "insulin": "مستوى الإنسولين",
-        "bmi": "مؤشر كتلة الجسم",
-        "dpf": "عامل التاريخ العائلي للسكري",
-        "age": "العمر",
-        "select_model": "اختر النموذج",
-        "predict": "تنفيذ التنبؤ",
-        "result_title": "نتيجة التنبؤ",
-        "diabetic": "مصاب",
-        "not_diabetic": "غير مصاب",
-        "back": "رجوع",
-        "theme": "تغيير الثيم",
-        "language": "اللغة"
-    }
+  "en": {
+    "university": "Arab University for Medical Sciences and Technology",
+    "title": "Diabetes Prediction System",
+    "description": "Enter patient laboratory values below to predict diabetes.",
+    
+    "input_data": "Input Data",
+    "input_method": "Input Method",
+    "manual": "Manual",
+    "range": "Range",
+
+    "pregnancies": "Pregnancies",
+    "glucose": "Glucose Level",
+    "bp": "Blood Pressure",
+    "skin": "Skin Thickness",
+    "insulin": "Insulin Level",
+    "bmi": "BMI",
+    "dpf": "Diabetes Pedigree Function",
+    "age": "Age",
+
+    "select_model": "Select a Model",
+    "predict": "Predict",
+    "result_title": "Prediction Result",
+    "diabetic": "Diabetic",
+    "not_diabetic": "Not Diabetic",
+    "back": "Back",
+    "theme": "Switch Theme",
+    "language": "Language"
+  },
+
+  "ar": {
+    "university": "جامعة العرب للعلوم الطبية والتكنولوجيا",
+    "title": "نظام التنبؤ بمرض السكري",
+    "description": "أدخل القيم المخبرية للمريض للتنبؤ بمرض السكري.",
+    
+    "input_data": "بيانات المريض",
+    "input_method": "طريقة الإدخال",
+    "manual": "كتابة يدوية",
+    "range": "اختيار من قيم",
+
+    "pregnancies": "عدد مرات الحمل",
+    "glucose": "مستوى الجلوكوز",
+    "bp": "ضغط الدم",
+    "skin": "سماكة الجلد",
+    "insulin": "مستوى الإنسولين",
+    "bmi": "مؤشر كتلة الجسم",
+    "dpf": "عامل التاريخ العائلي للسكري",
+    "age": "العمر",
+
+    "select_model": "اختر النموذج",
+    "predict": "تنفيذ التنبؤ",
+    "result_title": "نتيجة التنبؤ",
+    "diabetic": "مصاب",
+    "not_diabetic": "غير مصاب",
+    "back": "رجوع",
+    "theme": "تغيير الثيم",
+    "language": "اللغة"
+  }
 }
