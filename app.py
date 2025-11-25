@@ -1,5 +1,4 @@
 import streamlit as st
-import pandas as pd
 import numpy as np
 import os
 import joblib
@@ -42,34 +41,37 @@ def update_theme():
     st.session_state.theme = "dark" if st.session_state.theme == "light" else "light"
 
 # ------------------------------------------------------------
-# Apply Theme + Animations
+# Apply Theme + Animations + Footer Style
 # ------------------------------------------------------------
 def apply_theme():
     if st.session_state.theme == "dark":
         st.markdown("""
             <style>
-            .stApp { background-color:#0e1117; color:#ffffff; }
+            .stApp {
+                background-color:#0e1117;
+                color:#ffffff;
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+            }
 
-            /* TEXT */
             h1,h2,h3,h4,h5,h6,label,span,p,div {
                 color:#ffffff !important;
             }
 
-            /* Fade-in animation */
+            /* Fade-in */
             .fade-in {
                 animation: fadeIn 1.2s ease-in-out;
             }
-
             @keyframes fadeIn {
-                from { opacity: 0; transform: translateY(10px); }
-                to { opacity: 1; transform: translateY(0); }
+                from { opacity:0; transform: translateY(10px); }
+                to { opacity:1; transform: translateY(0); }
             }
 
-            /* Bounce animation */
+            /* Bounce */
             .bounce {
                 animation: bounceIn 0.9s ease;
             }
-
             @keyframes bounceIn {
                 0% { transform: scale(0.3); opacity: 0; }
                 50% { transform: scale(1.05); opacity: 1; }
@@ -77,17 +79,14 @@ def apply_theme():
                 100% { transform: scale(1); }
             }
 
-            /* Fixed footer */
+            /* Dynamic Footer */
             .footer {
-                position: fixed;
-                bottom: 0;
-                left: 0;
                 width: 100%;
-                background-color: #111;
-                padding: 10px;
+                padding: 12px;
                 text-align: center;
-                color: #ccc;
+                margin-top: 50px;
                 font-size: 14px;
+                color: #bbbbbb;
                 border-top: 1px solid #444;
             }
             </style>
@@ -96,7 +95,13 @@ def apply_theme():
     else:
         st.markdown("""
             <style>
-            .stApp { background-color:#ffffff; color:#000000; }
+            .stApp {
+                background-color:#ffffff;
+                color:#000000;
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+            }
 
             h1,h2,h3,h4,h5,h6,label,span,p,div {
                 color:#000000 !important;
@@ -107,8 +112,8 @@ def apply_theme():
             }
 
             @keyframes fadeIn {
-                from { opacity: 0; transform: translateY(10px); }
-                to { opacity: 1; transform: translateY(0); }
+                from { opacity:0; transform: translateY(10px); }
+                to { opacity:1; transform: translateY(0); }
             }
 
             .bounce {
@@ -123,14 +128,14 @@ def apply_theme():
             }
 
             .footer {
-    width: 100%;
-    padding: 10px;
-    text-align: center;
-    margin-top: 40px;
-    font-size: 14px;
-    opacity: 0.9;
-}
-
+                width: 100%;
+                padding: 12px;
+                text-align: center;
+                margin-top: 50px;
+                font-size: 14px;
+                color: #444;
+                border-top: 1px solid #ccc;
+            }
             </style>
         """, unsafe_allow_html=True)
 
@@ -156,6 +161,7 @@ def load_models():
                     models[file] = load_model(path)
                 except:
                     pass
+
     return models
 
 models = load_models()
@@ -171,22 +177,18 @@ def go_to(page):
 # ------------------------------------------------------------
 def home_page():
 
-    # Logo (BIGGER)
     try:
-        st.image("images/university_logo.jpg", width=350)
+        st.image("images/university_logo.jpg", width=380)
     except:
         pass
 
     st.markdown(f"<h3 class='fade-in'>{T('university')}</h3>", unsafe_allow_html=True)
-
     st.markdown(f"<h1 class='fade-in'>{T('title')}</h1>", unsafe_allow_html=True)
     st.markdown(f"<p class='fade-in'>{T('description')}</p>", unsafe_allow_html=True)
 
     st.divider()
 
-    # Sidebar
     with st.sidebar:
-
         st.button(T("theme"), on_click=update_theme)
 
         st.radio(
@@ -198,6 +200,7 @@ def home_page():
         )
 
         st.subheader(T("select_model"))
+
         if len(models) == 0:
             st.error("No models found.")
             model_name = None
@@ -235,21 +238,16 @@ def home_page():
 def result_page():
 
     try:
-        st.image("images/university_logo.jpg", width=350)
+        st.image("images/university_logo.jpg", width=380)
     except:
         pass
 
     st.markdown(f"<h3>{T('university')}</h3>", unsafe_allow_html=True)
-
     st.title(T("result_title"))
     st.divider()
 
     model = models.get(st.session_state.selected_model, None)
     data = st.session_state.pred_input
-
-    if model is None:
-        st.error("Model not found.")
-        return
 
     try:
         pred = model.predict(data)
@@ -261,15 +259,16 @@ def result_page():
 
     st.markdown(
         f"<h1 class='bounce' style='text-align:center; font-size:60px;'>{result_label}</h1>",
-        unsafe_allow_html=True,
+        unsafe_allow_html=True
     )
 
     st.divider()
+
     if st.button(T("back"), use_container_width=True):
         go_to("home")
 
 # ------------------------------------------------------------
-# FIXED FOOTER (BOTTOM BAR)
+# FOOTER (DYNAMIC, NOT FIXED)
 # ------------------------------------------------------------
 footer_html = """
 <div class='footer'>
@@ -284,10 +283,9 @@ footer_html = """
 st.markdown(footer_html, unsafe_allow_html=True)
 
 # ------------------------------------------------------------
-# RENDER
+# RENDER PAGE
 # ------------------------------------------------------------
 if st.session_state.page == "home":
     home_page()
 else:
     result_page()
-
