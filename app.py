@@ -14,16 +14,16 @@ with open("assets/translations.json", "r", encoding="utf-8") as f:
     translations = json.load(f)
 
 # ------------------------------------------------------------
-# Session State Initialization
+# Session State Initialization (DEFAULTS: lang=en, theme=dark)
 # ------------------------------------------------------------
 if "lang" not in st.session_state:
-    st.session_state.lang = "en"
+    st.session_state.lang = "en"     # default ENGLISH
 
 if "page" not in st.session_state:
     st.session_state.page = "home"
 
 if "theme" not in st.session_state:
-    st.session_state.theme = "light"
+    st.session_state.theme = "dark"   # default DARK MODE
 
 # ------------------------------------------------------------
 # Translation Helper
@@ -32,16 +32,14 @@ def T(key):
     return translations[st.session_state.lang].get(key, key)
 
 # ------------------------------------------------------------
-# Language + Theme Callbacks (No rerun inside pages)
+# Language + Theme Update Functions
 # ------------------------------------------------------------
 def update_language():
     choice = st.session_state.lang_selector
     st.session_state.lang = "ar" if choice == "العربية" else "en"
 
 def update_theme():
-    st.session_state.theme = (
-        "dark" if st.session_state.theme == "light" else "light"
-    )
+    st.session_state.theme = "dark" if st.session_state.theme == "light" else "light"
 
 # ------------------------------------------------------------
 # Apply Theme
@@ -50,14 +48,14 @@ def apply_theme():
     if st.session_state.theme == "dark":
         st.markdown("""
             <style>
-            .stApp { background-color:#0e1117; color:#ffffff; }
+            .stApp { background-color:#0e1117 !important; color:#ffffff !important; }
             h1,h2,h3,h4,h5,h6,label,span,p,div { color:#ffffff !important; }
             </style>
         """, unsafe_allow_html=True)
     else:
         st.markdown("""
             <style>
-            .stApp { background-color:#ffffff; color:#000000; }
+            .stApp { background-color:#ffffff !important; color:#000000 !important; }
             h1,h2,h3,h4,h5,h6,label,span,p,div { color:#000000 !important; }
             </style>
         """, unsafe_allow_html=True)
@@ -99,12 +97,13 @@ def go_to(page):
 # ------------------------------------------------------------
 def home_page():
 
-    # University Logo
+    # Logo
     try:
         st.image("images/university_logo.jpg", width=200)
     except:
         pass
 
+    # University Name
     st.markdown(f"### {T('university')}")
     st.title(T("title"))
     st.write(T("description"))
@@ -119,6 +118,7 @@ def home_page():
             T("language"),
             ["English", "العربية"],
             key="lang_selector",
+            index=0,  # default ENGLISH
             on_change=update_language
         )
 
@@ -200,3 +200,4 @@ if st.session_state.page == "home":
     home_page()
 else:
     result_page()
+
